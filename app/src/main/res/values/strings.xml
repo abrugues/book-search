@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Book Search</string>
+    <string name="search_hint">Search books, authors, &#8230;</string>
+
+    <string name="by">By</string>
+    <string name="description">Description:</string>
+    <string name="no_author">No author</string>
+    <string name="not_available">Not available</string>
+    <string name="publisher">Publisher:</string>
+    <string name="pages">Pages:</string>
+    <string name="unknown">Unknown</string>
+
+</resources>
