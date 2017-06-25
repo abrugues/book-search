@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ch.abrugues.booksearch.R;
 import ch.abrugues.booksearch.model.BookList;
 import ch.abrugues.booksearch.network.BookListTask;
@@ -17,12 +19,12 @@ import ch.abrugues.booksearch.utils.RecyclerViewBookAdapter;
 
 public class BookListActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.progressBar) ProgressBar progressBar;
+
     private RecyclerViewBookAdapter mAdapter;
     private LinearLayoutManager mLayoutManager;
     private EndlessRecyclerViewScrollListener mScrollListener;
-
-    private ProgressBar progressBar;
 
     private String mQuery = null;
 
@@ -30,8 +32,7 @@ public class BookListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        ButterKnife.bind(this);
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -46,8 +47,6 @@ public class BookListActivity extends AppCompatActivity {
 
         mAdapter = new RecyclerViewBookAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
-
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
     }
 

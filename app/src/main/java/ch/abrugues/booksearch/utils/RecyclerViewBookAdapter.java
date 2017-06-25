@@ -18,6 +18,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ch.abrugues.booksearch.R;
 import ch.abrugues.booksearch.model.Book;
 import ch.abrugues.booksearch.ui.BookDetailsActivity;
@@ -80,16 +82,15 @@ public class RecyclerViewBookAdapter extends RecyclerView.Adapter<RecyclerViewBo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView mThumbnailImgView;
-        private TextView mTitleTxtView, mAuthorTxtView;
+        @BindView(R.id.thumbnailImgView) ImageView mThumbnailImgView;
+        @BindView(R.id.titleTxtView) TextView mTitleTxtView;
+        @BindView(R.id.authorTxtView) TextView mAuthorTxtView;
 
         private Book book;
 
         private ViewHolder(View itemView) {
             super(itemView);
-            mThumbnailImgView = (ImageView) itemView.findViewById(R.id.thumbnailImgView);
-            mTitleTxtView = (TextView) itemView.findViewById(R.id.titleTxtView);
-            mAuthorTxtView = (TextView) itemView.findViewById(R.id.authorTxtView);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override

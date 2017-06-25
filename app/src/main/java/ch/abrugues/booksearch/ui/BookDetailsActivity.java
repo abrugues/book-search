@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ch.abrugues.booksearch.R;
 import ch.abrugues.booksearch.model.Book;
 
@@ -19,23 +21,23 @@ public class BookDetailsActivity extends AppCompatActivity {
     private static final String ACTIVITY_TITLE = "activityTitle";
     private static final String BOOK_DETAILS = "bookDetails";
 
+    @BindView(R.id.coverImgView) ImageView coverImgView;
+    @BindView(R.id.titleTxtView) TextView titleTxtView;
+    @BindView(R.id.authorTxtView) TextView authorTxtView;
+    @BindView(R.id.publisherTxtView) TextView publisherTxtView;
+    @BindView(R.id.pagesTxtView) TextView pagesTxtView;
+    @BindView(R.id.descriptionExpTxtView) ExpandableTextView descriptionExpTxtView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_details);
+        ButterKnife.bind(this);
 
         setTitle(getIntent().getExtras().getString(ACTIVITY_TITLE));
 
         // Get the book from the intent
         Book book = (Book) getIntent().getExtras().getSerializable(BOOK_DETAILS);
-
-        // Instantiate UI elements
-        ImageView coverImgView = (ImageView) findViewById(R.id.coverImgView);
-        TextView titleTxtView = (TextView) findViewById(R.id.titleTxtView);
-        TextView authorTxtView = (TextView) findViewById(R.id.authorTxtView);
-        TextView publisherTxtView = (TextView) findViewById(R.id.publisherTxtView);
-        TextView pagesTxtView = (TextView) findViewById(R.id.pagesTxtView);
-        ExpandableTextView descriptionExpTxtView = (ExpandableTextView) findViewById(R.id.descriptionExpTxtView);
 
         // Populate UI elements
         // Image
