@@ -8,10 +8,14 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.abrugues.booksearch.R;
+import ch.abrugues.booksearch.dagger.BookSearchApplication;
 import ch.abrugues.booksearch.model.BookList;
 import ch.abrugues.booksearch.network.BookSvcApi;
 import ch.abrugues.booksearch.utils.EndlessRecyclerViewScrollListener;
@@ -19,8 +23,6 @@ import ch.abrugues.booksearch.utils.RecyclerViewBookAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BookListActivity extends AppCompatActivity {
 
@@ -33,6 +35,9 @@ public class BookListActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private EndlessRecyclerViewScrollListener mScrollListener;
 
+    @Inject
+    BookSvcApi bookSvcApi;
+
     private String mQuery = null;
 
     @Override
@@ -40,6 +45,8 @@ public class BookListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_list);
         ButterKnife.bind(this);
+
+        ((BookSearchApplication) getApplication()).getApplicationComponent().inject(this);
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -95,11 +102,7 @@ public class BookListActivity extends AppCompatActivity {
             mAdapter.clear();
             mScrollListener.resetState();
         }
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BookSvcApi.GOOGLE_API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        BookSvcApi bookSvcApi = retrofit.create(BookSvcApi.class);
+
         String startIndex = String.valueOf(page * MAX_RESULTS);
         String maxResults = String.valueOf(MAX_RESULTS);
         Call<BookList> bookListCall = bookSvcApi.searchBooks(mQuery, startIndex, maxResults);
@@ -114,7 +117,7 @@ public class BookListActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<BookList> call, Throwable t) {
-
+                Toast.makeText(BookListActivity.this, "Error getting the books", Toast.LENGTH_LONG).show();
             }
         });
 
