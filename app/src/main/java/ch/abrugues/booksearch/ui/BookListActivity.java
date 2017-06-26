@@ -13,11 +13,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.abrugues.booksearch.R;
 import ch.abrugues.booksearch.model.BookList;
-import ch.abrugues.booksearch.network.BookListTask;
+import ch.abrugues.booksearch.network.BookSvcApi;
 import ch.abrugues.booksearch.utils.EndlessRecyclerViewScrollListener;
 import ch.abrugues.booksearch.utils.RecyclerViewBookAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BookListActivity extends AppCompatActivity {
+
+    private static final int MAX_RESULTS = 20;
 
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
     @BindView(R.id.progressBar) ProgressBar progressBar;
@@ -40,7 +47,7 @@ public class BookListActivity extends AppCompatActivity {
         mScrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                loadNextData(page);
+                fetchBooks(page);
             }
         };
         mRecyclerView.addOnScrollListener(mScrollListener);
@@ -63,7 +70,7 @@ public class BookListActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 // Ask for the books to the remote server
                 mQuery = query;
-                queryBooks();
+                fetchBooks(0);
                 // Reset the SearchView
                 searchView.clearFocus();
                 searchView.setQuery("", false);
@@ -82,30 +89,35 @@ public class BookListActivity extends AppCompatActivity {
         return true;
     }
 
-    private void queryBooks() {
-        new BookListTask(mQuery, 0) {
+    private void fetchBooks(final int page) {
+        if (page == 0) {
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+            mAdapter.clear();
+            mScrollListener.resetState();
+        }
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BookSvcApi.GOOGLE_API_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        BookSvcApi bookSvcApi = retrofit.create(BookSvcApi.class);
+        String startIndex = String.valueOf(page * MAX_RESULTS);
+        String maxResults = String.valueOf(MAX_RESULTS);
+        Call<BookList> bookListCall = bookSvcApi.searchBooks(mQuery, startIndex, maxResults);
+        bookListCall.enqueue(new Callback<BookList>() {
             @Override
-            protected void onPreExecute() {
-                progressBar.setVisibility(ProgressBar.VISIBLE);
-                mAdapter.clear();
-                mScrollListener.resetState();
+            public void onResponse(Call<BookList> call, Response<BookList> response) {
+                if (page == 0) {
+                    progressBar.setVisibility(ProgressBar.GONE);
+                }
+                mAdapter.addAll(response.body().getBooks());
             }
-            @Override
-            protected void onPostExecute(BookList bookList) {
-                progressBar.setVisibility(ProgressBar.GONE);
-                mAdapter.addAll(bookList.getBooks());
-            }
-        }.execute();
 
-    }
-
-    private void loadNextData(int page) {
-        new BookListTask(mQuery, page) {
             @Override
-            protected void onPostExecute(BookList bookList) {
-                mAdapter.addAll(bookList.getBooks());
+            public void onFailure(Call<BookList> call, Throwable t) {
+
             }
-        }.execute();
+        });
+
     }
 
     public String getQuery() {
